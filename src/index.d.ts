@@ -16,6 +16,10 @@ export interface DropzoneAreaProps {
     onDrop?: (files: any) => void;
     onDropRejected?: (files: any, evt: any) => void;
     onDelete?: (file: any) => void;
+    getFileLimitExceedMessage?: (filesLimit: number) => string;
+    getFileAddedMessage?: (fileName: string) => string;
+    getFileRemovedMessage?: (fileName: string) => string;
+    getDropRejectMessage?: (rejectedFile: any, acceptedFiles: string[], maxFileSize: number) => string;
 }
 export const DropzoneArea: React.ComponentType<DropzoneAreaProps>;
 
