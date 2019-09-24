@@ -12,6 +12,7 @@ export interface DropzoneAreaProps {
     clearOnUnmount?: boolean;
     dropzoneClass?: string;
     dropzoneParagraphClass?: string;
+    replaceOnFileLimitExceed?: boolean;
     onChange?: (files: any) => void;
     onDrop?: (files: any) => void;
     onDropRejected?: (files: any, evt: any) => void;
