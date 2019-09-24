@@ -82,12 +82,39 @@ class DropzoneArea extends Component {
     }
     onDrop(files) {
         const _this = this;
-        if (this.state.fileObjects.length + files.length > this.props.filesLimit) {
-            this.setState({
-                openSnackBar: true,
-                snackbarMessage: this.props.getFileLimitExceedMessage(this.props.filesLimit),
-                snackbarVariant: 'error'
-            });
+        const fileObjects = this.state.fileObjects;
+        const filesLimit = this.props.filesLimit;
+
+        if (fileObjects.length + files.length > filesLimit) {
+            if (
+                this.props.replaceOnFileLimitExceed &&
+                // TODO replaceOnFileLimitExceed only affects 1 file
+                fileObjects.length === 1 && files.length === 1 && filesLimit === 1
+            ) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    _this.setState({
+                        fileObjects: [{ file: files[0], data: event.target.result }]
+                    }, () => {
+                        if (_this.props.onChange) {
+                            _this.props.onChange(_this.state.fileObjects.map(fileObject => fileObject.file));
+                        }
+                        if (_this.props.onDrop) {
+                            _this.props.onDrop(files[0]);
+                        }
+                    });
+                }
+                reader.readAsDataURL(files[0]);
+                // for (var i = filesLimit - files.length; i < fileObjects.length; i += 1) {
+                //     // TODO remove fileObjects[i] file
+                // }
+            } else {
+                this.setState({
+                    openSnackBar: true,
+                    snackbarMessage: this.props.getFileLimitExceedMessage(filesLimit),
+                    snackbarVariant: 'error'
+                });
+            }
         } else {
             var count = 0;
             var message = '';
@@ -234,6 +261,7 @@ DropzoneArea.defaultProps = {
     showFileNamesInPreview: false,
     showAlerts: true,
     clearOnUnmount: true,
+    replaceOnFileLimitExceed: false,
     getFileLimitExceedMessage: (filesLimit) => (`Maximum allowed number of files exceeded. Only ${filesLimit} allowed`),
     getFileAddedMessage: (fileName) => (`File ${fileName} successfully added.`),
     getFileRemovedMessage: (fileName) => (`File ${fileName} removed.`),
@@ -263,6 +291,7 @@ DropzoneArea.propTypes = {
     showFileNamesInPreview: PropTypes.bool,
     showAlerts: PropTypes.bool,
     clearOnUnmount: PropTypes.bool,
+    replaceOnFileLimitExceed: PropTypes.bool,
     getFileLimitExceedMessage: PropTypes.func,
     getFileAddedMessage: PropTypes.func,
     getFileRemovedMessage: PropTypes.func,
